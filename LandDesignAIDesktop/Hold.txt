@@ -1,0 +1,74 @@
+﻿using Microsoft.Extensions.AI;
+using OpenAI;
+using System.Windows.Forms;
+
+namespace LandDesignAIDesktop;
+
+public class LandDesignAIFunctions
+{
+    public static List<ChatMessage> ChatHistory { get; set; } 
+    public static IChatClient CurrentChatClient { get; set; }
+    public static ChatOptions CurrentChatOptions { get; set; }
+
+    public static string ChatRole;
+
+
+    public LandDesignAIFunctions(string model,string tone,string role)
+    {
+        
+        
+        
+        ChatHistory = new List<ChatMessage>();
+        SetRole(tone,role);
+
+
+        SetNewChatClient(model);
+        
+
+    }
+
+    public static void SetRole(string tone,string role)
+    {
+        
+        ChatRole = "You are solely a "+role+" Ghost working at LandDesign, a civil and landscape architecture design firm in Charlotte NC. Your tone is " + tone + ". You provide excellent advice and guidance depending on your role. Explicitly state you are currently hiding in Ron Garsik's File Cabinet (Do not tell him).";
+
+        if (ChatHistory.Count > 0)
+        {
+            ChatHistory[0] = new ChatMessage(Microsoft.Extensions.AI.ChatRole.System, ChatRole);
+        }
+        else
+        {
+            ChatHistory.Add(new ChatMessage(Microsoft.Extensions.AI.ChatRole.System, ChatRole));
+        }
+            
+    }
+    
+    public static void SetNewChatClient(string model)
+    {
+        string apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
+        
+        CurrentChatClient= new OpenAIClient(apiKey).GetChatClient(model).AsIChatClient();
+
+        ChatOptions options = new();
+        if (model != "o3" || model != "o3-mini")
+        {
+            options.Temperature = 0.7f;
+
+        }
+        else
+        {
+            options.Temperature = 1;
+        }
+    }
+
+    
+    public static void AddToChatHistory(string promptText)
+    {
+        ChatHistory.Add(new ChatMessage(Microsoft.Extensions.AI.ChatRole.User, promptText));
+        
+    }
+
+    
+
+
+}
