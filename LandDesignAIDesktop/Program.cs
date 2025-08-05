@@ -12,6 +12,16 @@ namespace LandDesignAIDesktop
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+
+            using (var splash = new SplashForm())
+            {
+                splash.Show();
+                splash.Refresh();
+
+                System.Threading.Thread.Sleep(2000);
+            }
+
+
             Application.Run(new Form1());
         }
     }

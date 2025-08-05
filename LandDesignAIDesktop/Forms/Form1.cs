@@ -140,7 +140,7 @@ namespace LandDesignAIDesktop.Forms
             if (thisChatPanel == null)
             {
                 thisChatPanel = tabPage_ThisChat.Controls
-                    .Cast<Control>()                 
+                    .Cast<Control>()
                     .SelectMany(c => c.Controls.Cast<Control>())
                     .OfType<ChatPanel>()
                     .FirstOrDefault();

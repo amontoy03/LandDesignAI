@@ -74,6 +74,17 @@ namespace LandDesignAIDesktop
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
 
+        public void SaveMessage(string chatId, string role, string message)
+        {
+            using var conn = GetOpenConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "INSERT INTO Chats (ChatId, Role, Message) VALUES (@chatId, @role, @message)";
+            cmd.Parameters.AddWithValue("@chatId", chatId);
+            cmd.Parameters.AddWithValue("@role", role);
+            cmd.Parameters.AddWithValue("@message", message);
+            cmd.ExecuteNonQuery();
+        }
+
         /// <summary>
         /// Removes the row at the specified zero-based index (ordered by ROWID).
         /// Returns true if a row was deleted, false if the index is out of range.
@@ -126,6 +137,31 @@ namespace LandDesignAIDesktop
             ";
             cmd.ExecuteNonQuery();
         }
+
+        public Dictionary<string, List<(string ChatRole, string ChatMessage)>> LoadMessagesByChat()
+        {
+            var chats = new Dictionary<string, List<(string ChatRole, string ChatMessage)>>();
+
+            using var conn = GetOpenConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT ChatName, ChatRole, ChatMessage FROM Messages ORDER BY rowid ASC";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                string chatName = reader.IsDBNull(0) ? "Untitled" : reader.GetString(0);
+                string chatRole = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                string chatMessage = reader.IsDBNull(2) ? "" : reader.GetString(2);
+
+                if (!chats.ContainsKey(chatName))
+                {
+                    chats[chatName] = new List<(string ChatRole, string ChatMessage)>();
+                }
+
+                chats[chatName].Add((chatRole, chatMessage));
+            }
+
+            return chats;
+        }
     }
 }
-
