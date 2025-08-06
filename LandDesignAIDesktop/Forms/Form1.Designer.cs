@@ -508,18 +508,6 @@
             materialTextBox21.TrailingIcon = null;
             materialTextBox21.UseSystemPasswordChar = false;
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Dock = DockStyle.Fill;
-            label2.Font = new Font("Segoe UI", 8.25F, FontStyle.Italic, GraphicsUnit.Point, 0);
-            label2.Location = new Point(78, 666);
-            label2.Name = "label2";
-            label2.Size = new Size(615, 54);
-            label2.TabIndex = 7;
-            label2.Text = "AI can make mistakes. Check important info.";
-            label2.TextAlign = ContentAlignment.TopCenter;
-            // 
             // flowLayoutPanel2
             // 
             flowLayoutPanel2.AutoScroll = true;

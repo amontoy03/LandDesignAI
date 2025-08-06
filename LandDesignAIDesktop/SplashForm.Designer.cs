@@ -29,7 +29,7 @@
             // 
             this.labelTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.labelTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
-            this.labelTitle.ForeColor = System.Drawing.Color.Black;
+            this.labelTitle.ForeColor = System.Drawing.Color.White;
             this.labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.labelTitle.Height = 100;
             this.labelTitle.Text = "LandDesign AI";
@@ -38,7 +38,7 @@
             // 
             this.labelSubtitle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.labelSubtitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular);
-            this.labelSubtitle.ForeColor = System.Drawing.Color.Gray;
+            this.labelSubtitle.ForeColor = System.Drawing.Color.White;
             this.labelSubtitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.labelSubtitle.Text = "Loading AI Assistant...";
             // 
@@ -46,7 +46,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
+            this.BackColor = System.Drawing.Color.ForestGreen;
             this.ClientSize = new System.Drawing.Size(400, 200);
             this.Controls.Add(this.labelSubtitle);
             this.Controls.Add(this.labelTitle);
