@@ -61,7 +61,7 @@ public class LandDesignOpenAIFunctions
 
         CurrentChatOptions = new ChatOptions
         {
-            MaxOutputTokens = 50, 
+            MaxOutputTokens = 1024, 
             Temperature = (model != "o3" && model != "o3-mini") ? 0.3f : 1f
         };
     }

@@ -124,41 +124,46 @@ namespace LandDesignAIDesktop
             using var cmd = conn.CreateCommand();
 
             cmd.CommandText = @"
-                PRAGMA journal_mode = WAL;
-                PRAGMA foreign_keys = ON;
+        PRAGMA journal_mode = WAL;
+        PRAGMA foreign_keys = ON;
 
-                CREATE TABLE IF NOT EXISTS Messages (
-                    ChatName     TEXT,
-                    ChatTone     TEXT,
-                    ChatRole     TEXT,
-                    ChatMessage  TEXT,
-                    ChatUser     TEXT
-                );
-            ";
+        CREATE TABLE IF NOT EXISTS Messages (
+            ChatName     TEXT,
+            ChatTone     TEXT,
+            ChatRole     TEXT,
+            ChatMessage  TEXT,
+            ChatUser     TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS Chats (
+            ChatId   TEXT,
+            Role     TEXT,
+            Message  TEXT
+        );
+    ";
+
             cmd.ExecuteNonQuery();
         }
 
-        public Dictionary<string, List<(string ChatRole, string ChatMessage)>> LoadMessagesByChat()
+        public Dictionary<string, List<(string Role, string Message)>> LoadMessagesByChatId()
         {
-            var chats = new Dictionary<string, List<(string ChatRole, string ChatMessage)>>();
+            var chats = new Dictionary<string, List<(string Role, string Message)>>();
 
             using var conn = GetOpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ChatName, ChatRole, ChatMessage FROM Messages ORDER BY rowid ASC";
+            cmd.CommandText = "SELECT ChatId, Role, Message FROM Chats ORDER BY rowid ASC;";
 
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                string chatName = reader.IsDBNull(0) ? "Untitled" : reader.GetString(0);
-                string chatRole = reader.IsDBNull(1) ? "" : reader.GetString(1);
-                string chatMessage = reader.IsDBNull(2) ? "" : reader.GetString(2);
+                string chatId = reader.IsDBNull(0) ? "Untitled" : reader.GetString(0);
+                string role = reader.IsDBNull(1) ? "user" : reader.GetString(1);
+                string message = reader.IsDBNull(2) ? "" : reader.GetString(2);
 
-                if (!chats.ContainsKey(chatName))
-                {
-                    chats[chatName] = new List<(string ChatRole, string ChatMessage)>();
-                }
+                if (!chats.ContainsKey(chatId))
+                    chats[chatId] = new List<(string, string)>();
 
-                chats[chatName].Add((chatRole, chatMessage));
+                chats[chatId].Add((role, message));
             }
 
             return chats;

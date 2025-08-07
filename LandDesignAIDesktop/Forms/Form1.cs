@@ -96,7 +96,17 @@ namespace LandDesignAIDesktop.Forms
                 throw new InvalidOperationException("CurrentChatClient is not initialized.");
 
             var options = LandDesignOpenAIFunctions.CurrentChatOptions;
-            var history = LandDesignOpenAIFunctions.ChatHistory ?? new List<ChatMessage>();
+            var tab = materialTabControl_Left.SelectedTab;
+            List<ChatMessage> history;
+
+            if (tab != null && _chatHistories.TryGetValue(tab, out var h))
+            {
+                history = h;
+            }
+            else
+            {
+                history = new List<ChatMessage>();
+            }
 
             var sb = new StringBuilder();
 
@@ -131,25 +141,38 @@ namespace LandDesignAIDesktop.Forms
         {
             _sqliteFunctionsFunctions = new AISqliteFunctions();
 
-            _chatHistories[tabPage_ThisChat] = new List<ChatMessage>();
+            var chatData = _sqliteFunctionsFunctions.LoadMessagesByChatId();
 
-            var thisChatPanel = tabPage_ThisChat.Controls
-                .OfType<ChatPanel>()
-                .FirstOrDefault();
-
-            if (thisChatPanel == null)
+            foreach (var kvp in chatData)
             {
-                thisChatPanel = tabPage_ThisChat.Controls
-                    .Cast<Control>()
-                    .SelectMany(c => c.Controls.Cast<Control>())
-                    .OfType<ChatPanel>()
-                    .FirstOrDefault();
-            }
+                string chatName = kvp.Key;
+                var messages = kvp.Value;
 
-            if (thisChatPanel != null)
-            {
-                thisChatPanel.SendMessageRequested += (s, message) => HandleUserMessage(thisChatPanel, message);
-                thisChatPanel.AddFilesRequested += (s, e2) => HandleAddFiles();
+                var tab = new TabPage(chatName);
+                var chatPanel = new ChatPanel { Dock = DockStyle.Fill };
+                tab.Controls.Add(chatPanel);
+                materialTabControl_Left.TabPages.Add(tab);
+
+                _chatHistories[tab] = new List<ChatMessage>();
+
+                foreach (var (role, message) in messages)
+                {
+                    var bubbleSender = role == "assistant" ? ChatBubble.Sender.Bot : ChatBubble.Sender.User;
+                    chatPanel.ChatFlow.Controls.Add(new ChatBubble(message, bubbleSender, chatPanel.Width));
+
+                    var chatRole = role.ToLower() switch
+                    {
+                        "user" => Microsoft.Extensions.AI.ChatRole.User,
+                        "assistant" => Microsoft.Extensions.AI.ChatRole.Assistant,
+                        "system" => Microsoft.Extensions.AI.ChatRole.System,
+                        _ => Microsoft.Extensions.AI.ChatRole.User
+                    };
+
+                    _chatHistories[tab].Add(new ChatMessage(chatRole, message));
+                }
+
+                chatPanel.SendMessageRequested += (s, message) => HandleUserMessage(chatPanel, message);
+                chatPanel.AddFilesRequested += (s, e2) => HandleAddFiles();
             }
         }
 
@@ -518,6 +541,13 @@ namespace LandDesignAIDesktop.Forms
         {
             var tab = materialTabControl_Left.SelectedTab;
             if (tab == null) return;
+
+            // ✅ Step 2 check: Ensure Chat Client is initialized
+            if (LandDesignOpenAIFunctions.CurrentChatClient == null)
+            {
+                MessageBox.Show("Chat client is not initialized.");
+                return;
+            }
 
             LandDesignOpenAIFunctions.CurrentChatOptions = new ChatOptions
             {
